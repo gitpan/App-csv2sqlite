@@ -22,7 +22,6 @@ my @modules = qw(
   DBIx::TableLoader::CSV
   ExtUtils::MakeMaker
   File::Find
-  File::Spec
   File::Spec::Functions
   File::Temp
   Getopt::Long
@@ -33,6 +32,7 @@ my @modules = qw(
   Test::More
   Test::Pod
   Test::Pod::Coverage
+  Try::Tiny
   perl
   strict
   warnings

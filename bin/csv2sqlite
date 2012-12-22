@@ -23,7 +23,8 @@ __END__
 
 =encoding utf-8
 
-=for :stopwords Randy Stauner ACKNOWLEDGEMENTS TODO CSV csv sqlite
+=for :stopwords Randy Stauner ACKNOWLEDGEMENTS TODO CSV csv sqlite csv2sqlite --csv
+--csv-file --csv-opt --dbname
 
 =head1 NAME
 
@@ -31,7 +32,7 @@ csv2sqlite - Import CSV files into a SQLite database
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

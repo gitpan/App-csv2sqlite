@@ -12,9 +12,9 @@ use warnings;
 
 package App::csv2sqlite;
 {
-  $App::csv2sqlite::VERSION = '0.001';
+  $App::csv2sqlite::VERSION = '0.002';
 }
-# git description: ed5cc95
+# git description: v0.001-14-g1b97f00
 
 BEGIN {
   $App::csv2sqlite::AUTHORITY = 'cpan:RWSTAUNER';
@@ -25,7 +25,7 @@ use Moo 1;
 
 use DBI 1.6 ();
 use DBD::SQLite 1 ();
-use DBIx::TableLoader::CSV 1.100 (); # catch csv errors
+use DBIx::TableLoader::CSV 1.101 (); # catch csv errors and close transactions
 use Getopt::Long 2.34 ();
 
 sub new_from_argv {
@@ -43,6 +43,11 @@ has csv_options => (
   default    => sub { +{} },
 );
 
+has loader_options => (
+  is         => 'ro',
+  default    => sub { +{} },
+);
+
 has dbname => (
   is         => 'ro',
 );
@@ -53,6 +58,7 @@ has dbh => (
 
 sub _build_dbh {
   my ($self) = @_;
+  # TODO: does the dbname need to be escaped in some way?
   my $dbh = DBI->connect('dbi:SQLite:dbname=' . $self->dbname, undef, undef, {
     RaiseError => 1,
     PrintError => 0,
@@ -61,6 +67,7 @@ sub _build_dbh {
 }
 
 sub help { Getopt::Long::HelpMessage(2); }
+
 
 sub getopt {
   my ($class, $args) = @_;
@@ -72,9 +79,12 @@ sub getopt {
       config => [qw(pass_through auto_help auto_version)],
     );
     $p->getoptions($opts,
-      'csv_files|csv_file|csvfiles|csvfile|csv=s@',
-      # TODO: 'csv_option|csvoption|o=%',
+      'csv_files|csv-file|csvfile|csv=s@',
+      # TODO: 'named_csv_files=s%'
+      # or maybe --csv and --named should be subs that append to an array ref to keep order?
+      'csv_options|csv-opt|csvopt|o=s%',
       # TODO: tableloader options like 'drop' or maybe --no-create
+      'loader_options|loader-opt|loaderopt|l=s%',
       'dbname|database=s',
     ) or $class->help;
     $args = [@ARGV];
@@ -97,9 +107,18 @@ sub load_tables {
   # TODO: option for wrapping the whole loop in a transaction rather than each table
 
   foreach my $file ( @{ $self->csv_files } ){
-    DBIx::TableLoader::CSV->new(
-      %{ $self->csv_options },
+    my %opts = (
+      %{ $self->loader_options },
+      csv_opts => { %{ $self->csv_options } },
       file => $file,
+    );
+
+    # TODO: This could work but i hate the escaping thing.
+    # Allow table=file (use "=file" for files with an equal sign).
+    #if( $file =~ /^([^=:]*)[=:](.+)$/ ){ $opts{name} = $1 if $1; $opts{file} = $2; }
+
+    DBIx::TableLoader::CSV->new(
+      %opts,
       dbh  => $self->dbh,
     )->load;
   }
@@ -123,9 +142,9 @@ __END__
 
 =encoding utf-8
 
-=for :stopwords Randy Stauner ACKNOWLEDGEMENTS TODO CSV csv sqlite cpan testmatrix url
-annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata
-placeholders metacpan
+=for :stopwords Randy Stauner ACKNOWLEDGEMENTS TODO CSV csv sqlite csv2sqlite --csv
+--csv-file --csv-opt --dbname cpan testmatrix url annocpan anno bugtracker
+rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -133,11 +152,14 @@ App::csv2sqlite - Import CSV files into a SQLite database
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
   csv2sqlite doggies.csv kitties.csv pets.sqlite
+
+  # configure CSV parsing as necessary:
+  csv2sqlite -o sep_char=$'\t' plants.tab plants.sqlite
 
 =head1 DESCRIPTION
 
@@ -147,6 +169,28 @@ Import CSV files into a SQLite database
 Each csv file specified on the command line
 will became a table in the resulting sqlite database.
 
+=head1 OPTIONS
+
+=over 4
+
+=item --csv-file (or --csv)
+
+The csv files to load
+
+=item --csv-opt (or -o)
+
+A hash of key=value options to pass to L<Text::CSV>
+
+=item --dbname (or --database)
+
+The file path for the SQLite database
+
+=item --loader-opt (or -l)
+
+A hash of key=value options to pass to L<DBIx::TableLoader::CSV>
+
+=back
+
 =for Pod::Coverage new_from_argv
 help
 getopt
@@ -154,6 +198,7 @@ load_tables
 run
 csv_files
 csv_options
+loader_options
 dbname
 dbh
 
@@ -163,11 +208,7 @@ dbh
 
 =item *
 
-csv options
-
-=item *
-
-various L<DBIx::TableLoader> options
+specific L<DBIx::TableLoader> options?
 
 =item *
 
@@ -176,6 +217,10 @@ confirm using a pre-existing database?
 =item *
 
 more tests
+
+=item *
+
+allow specifying table names for csv files
 
 =back
 

@@ -14,11 +14,11 @@ my %WriteMakefileArgs = (
   "BUILD_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Find" => 0,
-    "File::Spec" => 0,
     "File::Spec::Functions" => 0,
     "File::Temp" => "0.19",
     "List::Util" => 0,
-    "Test::More" => "0.96"
+    "Test::More" => "0.96",
+    "Try::Tiny" => "0.09"
   },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.30"
@@ -32,13 +32,13 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "DBD::SQLite" => 1,
     "DBI" => "1.6",
-    "DBIx::TableLoader::CSV" => "1.100",
+    "DBIx::TableLoader::CSV" => "1.101",
     "Getopt::Long" => "2.34",
     "Moo" => 1,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
