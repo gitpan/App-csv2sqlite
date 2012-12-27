@@ -71,7 +71,7 @@
    "provides" : {
       "App::csv2sqlite" : {
          "file" : "lib/App/csv2sqlite.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -87,7 +87,7 @@
          "web" : "https://github.com/rwstauner/App-csv2sqlite"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.014002"

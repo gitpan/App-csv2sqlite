@@ -12,9 +12,9 @@ use warnings;
 
 package App::csv2sqlite;
 {
-  $App::csv2sqlite::VERSION = '0.002';
+  $App::csv2sqlite::VERSION = '0.003';
 }
-# git description: v0.001-14-g1b97f00
+# git description: v0.002-1-gf06daee
 
 BEGIN {
   $App::csv2sqlite::AUTHORITY = 'cpan:RWSTAUNER';
@@ -152,7 +152,7 @@ App::csv2sqlite - Import CSV files into a SQLite database
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

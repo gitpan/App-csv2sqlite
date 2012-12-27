@@ -1,5 +1,9 @@
 Revision history for App-csv2sqlite
 
+0.003     2012-12-27T00:34:15Z
+
+  - Fix bug in tests causing failures on MSWin32.
+
 0.002     2012-12-22T18:25:19Z
 
   - Add --csv-opt (-o) and --loader-opt (-l) to accept key=value pairs
