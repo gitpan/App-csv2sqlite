@@ -8,11 +8,15 @@ Makefile.PL
 README
 bin/csv2sqlite
 corpus/chips.csv
+corpus/cp1252.csv
 corpus/pretzels.csv
+corpus/utf8.csv
 dist.ini
 lib/App/csv2sqlite.pm
 t/00-compile.t
 t/00-report-prereqs.t
+t/encoding.t
+t/lib/C2STests.pm
 t/module.t
 t/script.t
 xt/author/critic.t

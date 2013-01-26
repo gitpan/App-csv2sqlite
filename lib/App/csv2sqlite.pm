@@ -12,9 +12,9 @@ use warnings;
 
 package App::csv2sqlite;
 {
-  $App::csv2sqlite::VERSION = '0.003';
+  $App::csv2sqlite::VERSION = '0.004';
 }
-# git description: v0.002-1-gf06daee
+# git description: v0.003-3-g85d53f9
 
 BEGIN {
   $App::csv2sqlite::AUTHORITY = 'cpan:RWSTAUNER';
@@ -25,13 +25,24 @@ use Moo 1;
 
 use DBI 1.6 ();
 use DBD::SQLite 1 ();
-use DBIx::TableLoader::CSV 1.101 (); # catch csv errors and close transactions
+use DBIx::TableLoader::CSV 1.102 (); # catch csv errors and close transactions; file_encoding
 use Getopt::Long 2.34 ();
 
 sub new_from_argv {
   my ($class, $args) = @_;
   $class->new( $class->getopt($args) );
 }
+
+around BUILDARGS => sub {
+  my ($orig, $self, @args) = @_;
+  my $args = $self->$orig(@args);
+
+  if( my $enc = delete $args->{encoding} ){
+    ($args->{loader_options} ||= {})->{file_encoding} ||= $enc;
+  }
+
+  return $args;
+};
 
 has csv_files => (
   is         => 'ro',
@@ -62,8 +73,13 @@ sub _build_dbh {
   my $dbh = DBI->connect('dbi:SQLite:dbname=' . $self->dbname, undef, undef, {
     RaiseError => 1,
     PrintError => 0,
+    sqlite_unicode => $self->encoding ? 1 : 0,
   });
   return $dbh;
+}
+
+sub encoding {
+  return $_[0]->loader_options->{file_encoding};
 }
 
 sub help { Getopt::Long::HelpMessage(2); }
@@ -86,6 +102,7 @@ sub getopt {
       # TODO: tableloader options like 'drop' or maybe --no-create
       'loader_options|loader-opt|loaderopt|l=s%',
       'dbname|database=s',
+      'encoding|enc|e=s',
     ) or $class->help;
     $args = [@ARGV];
   }
@@ -152,7 +169,7 @@ App::csv2sqlite - Import CSV files into a SQLite database
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -185,6 +202,11 @@ A hash of key=value options to pass to L<Text::CSV>
 
 The file path for the SQLite database
 
+=item --encoding (or -e)
+
+The encoding of the csv files (a shortcut for C<< --loader-opt file_encoding=$enc >>);
+(Strings will be stored in the database in UTF-8.)
+
 =item --loader-opt (or -l)
 
 A hash of key=value options to pass to L<DBIx::TableLoader::CSV>
@@ -201,6 +223,8 @@ csv_options
 loader_options
 dbname
 dbh
+BUILDARGS
+encoding
 
 =head1 TODO
 

@@ -20,6 +20,7 @@ my @modules = qw(
   DBD::SQLite
   DBI
   DBIx::TableLoader::CSV
+  Exporter
   ExtUtils::MakeMaker
   File::Find
   File::Spec::Functions
@@ -35,6 +36,7 @@ my @modules = qw(
   Try::Tiny
   perl
   strict
+  utf8
   warnings
 );
 
